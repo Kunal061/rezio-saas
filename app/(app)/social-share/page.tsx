@@ -55,6 +55,24 @@ export default function SocialShare() {
     }
   }
 
+  const handleDownload = () => {
+    //if i do not have reference to the image
+    if(!imageRef.current) return
+
+    fetch(imageRef.current.src)   //grab the source of imageRef
+    .then((response) => response.blob())    //convert the image response to blob (binary format)
+    .then((blob) => {
+      const url = window.URL.createObjectURL(blob)    //creating a temp URL in the window to store the blob data
+      const link = document.createElement('a')    //create a new 'a' tag element
+      link.href = url     //store the created temp URL in the newly created "a" element
+      link.download = "image.png"   //tells the browser to download the data when created "a" tag is clicked and name it "image.png" by default
+      document.body.appendChild(link)   //attach the link to the document body
+      link.click()      //simulate a user click and trigger the download behaviour
+      document.body.removeChild(link)   //after download is done, remove the link from the document body
+      window.URL.revokeObjectURL(url)     //remove the temporarily created URL in the window
+    })
+  }
+
   return (
     <div>SocialShare</div>
   )
