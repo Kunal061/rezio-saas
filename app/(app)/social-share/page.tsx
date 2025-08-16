@@ -13,7 +13,6 @@ const socialFormats = {
 type SocialFormat = keyof typeof socialFormats;
 
 export default function SocialShare() {
-
   const [uploadedImage, setUploadedImage] = useState<string | null>(null)
   const [selectedFormat, setSelectedFormat] = useState<SocialFormat>("Instagram square (1:1)")
   const [isUploading, setIsUploading] = useState(false)
@@ -38,8 +37,16 @@ export default function SocialShare() {
         method: "POST",
         body: formData
       })
+
+      if(!response.ok) throw new Error("Failed to upload image")
+
+      const data = await response.json()
+      setUploadedImage(data.public_id)
     } catch (error) {
-      
+      console.log(error)
+      alert("Error uploading image")
+    } finally {
+      setIsUploading(false)
     }
   }
 
