@@ -36,6 +36,7 @@ export async function POST(request: NextRequest) {
 
     try {
         const formData = await request.formData()       //grab the form data from the frontend
+        
         const file = formData.get("file") as File | null    //grab the file from the formdata
         const title = formData.get("title") as string
         const description = formData.get("description") as string
