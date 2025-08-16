@@ -33,14 +33,19 @@ export default function SocialShare() {
     formData.append("file", file)
 
     try {
+      //send the file to API
       const response = await fetch("api/image-upload", {
         method: "POST",
         body: formData
       })
 
+      //if failed to send
       if(!response.ok) throw new Error("Failed to upload image")
 
+      //get the data
       const data = await response.json()
+
+      //set the uploaded image
       setUploadedImage(data.public_id)
     } catch (error) {
       console.log(error)
