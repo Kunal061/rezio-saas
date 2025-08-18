@@ -17,6 +17,7 @@ export default function SocialShare() {
   const [selectedFormat, setSelectedFormat] = useState<SocialFormat>("Instagram square (1:1)")
   const [isUploading, setIsUploading] = useState(false)
   const [isTransforming, setIsTransforming] = useState(false)
+  
   const imageRef = useRef<HTMLImageElement>(null)
 
   useEffect(() => {
