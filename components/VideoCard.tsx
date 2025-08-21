@@ -9,8 +9,8 @@ import { Video } from '@/app/generated/prisma'
 dayjs.extend(relativeTime)
 
 interface VideoCardProps {
-    video: Video,
-    onDownload: (url: string, title: string) => void
+  video: Video,
+  onDownload: (url: string, title: string) => void
 } 
 
 const VideoCard: React.FC<VideoCardProps> = ({video, onDownload}) => {
