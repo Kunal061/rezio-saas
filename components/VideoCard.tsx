@@ -5,6 +5,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import {Download, Clock, FileDown, FileUp, Play} from "lucide-react"
 import { filesize } from 'filesize'
 import { Video } from '@/app/generated/prisma'
+import Image from 'next/image'
 
 dayjs.extend(relativeTime)
 
@@ -99,10 +100,13 @@ const VideoCard: React.FC<VideoCardProps> = ({video, onDownload}) => {
           )
         ) : (
           <>
-            <img
+            <Image
               src={getThumbnailUrl(video.publicId)}
               alt={video.title}
-              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px"
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
+              priority={false}
             />
             {/* Play Overlay */}
             <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">

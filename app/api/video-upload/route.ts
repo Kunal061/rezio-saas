@@ -16,7 +16,7 @@ interface CloudinaryUploadResult {
     public_id: string
     bytes: number
     duration?: number
-    [key: string]: any
+    [key: string]: unknown
 }
 
 export async function POST(request: NextRequest) {
@@ -85,6 +85,6 @@ export async function POST(request: NextRequest) {
         console.log("Upload video failed", error);
         return NextResponse.json({error: "Upload video failed"}, {status: 500})
     } finally {
-        await prisma.$disconnect
+        await prisma.$disconnect()
     }
 }

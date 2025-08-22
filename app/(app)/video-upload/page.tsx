@@ -81,7 +81,7 @@ function VideoUpload() {
     formData.append("originalSize", file.size.toString())
 
     try {
-      const response = await axios.post("/api/video-upload", formData)
+      await axios.post("/api/video-upload", formData)
       setUploadProgress(100)
       setSuccess(true)
       
@@ -279,7 +279,7 @@ function VideoUpload() {
                 max="100"
               ></progress>
               <p className="text-center text-base-content/70 mt-4">
-                Please don't close this page while uploading
+                Please don&#39;t close this page while uploading
               </p>
             </div>
           )}

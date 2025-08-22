@@ -14,6 +14,7 @@ import {
   MoonIcon,
   XIcon,
 } from "lucide-react";
+import Image from "next/image";
 
 const sidebarItems = [
   { href: "/home", icon: LayoutDashboardIcon, label: "Home Page" },
@@ -164,11 +165,13 @@ export default function AppLayout({
                 <div className="bg-base-100 rounded-xl p-4 mb-4 shadow-sm border border-base-300/30">
                   <div className="flex items-center space-x-3">
                     <div className="avatar">
-                      <div className="w-12 h-12 rounded-full ring-2 ring-primary/30 ring-offset-2 ring-offset-base-100">
-                        <img
+                      <div className="w-12 h-12 rounded-full ring-2 ring-primary/30 ring-offset-2 ring-offset-base-100 relative overflow-hidden">
+                        <Image
                           src={user.imageUrl}
                           alt={user.username || user.emailAddresses[0].emailAddress}
-                          className="rounded-full"
+                          fill
+                          sizes="48px"
+                          className="rounded-full object-cover"
                         />
                       </div>
                     </div>
