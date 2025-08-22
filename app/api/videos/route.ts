@@ -1,6 +1,6 @@
 import {NextRequest, NextResponse} from "next/server"
 import { PrismaClient } from "@/app/generated/prisma"
-import { auth } from "@clerk/nextjs/server"
+// import { auth } from "@clerk/nextjs/server"
 
 const prisma = new PrismaClient()
 
@@ -21,10 +21,10 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-    const { userId } = await auth()
-    if (!userId) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-    }
+    // const { userId } = await auth()
+    // if (!userId) {
+    //     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    // }
 
     try {
         const body = await request.json() as {
