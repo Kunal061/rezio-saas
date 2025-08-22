@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
-import { auth } from "@clerk/nextjs/server";
 
 cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -9,9 +8,8 @@ cloudinary.config({
 });
 
 export async function POST(request: NextRequest) {
-  const { userId } = await auth();
-  if (!userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+    return NextResponse.json({ error: "Cloudinary env vars not configured" }, { status: 500 });
   }
 
   try {
@@ -22,7 +20,6 @@ export async function POST(request: NextRequest) {
       timestamp,
       folder,
       resource_type: "video",
-      // Example transformation to encourage mp4/auto quality server-side
       eager: "q_auto:good,f_mp4",
     };
 
@@ -39,7 +36,7 @@ export async function POST(request: NextRequest) {
       signature,
       params: paramsToSign,
     });
-  } catch (e) {
+  } catch {
     return NextResponse.json({ error: "Failed to create signature" }, { status: 500 });
   }
 }
