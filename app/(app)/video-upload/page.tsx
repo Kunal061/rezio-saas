@@ -75,51 +75,13 @@ function VideoUpload() {
     }, 200)
 
     try {
-      // 1) Get signed params from server
-      const sigRes = await axios.post("/api/cloudinary-signature", { folder: "video-uploads" })
-      const { cloudName, apiKey, timestamp, folder, signature, params } = sigRes.data as {
-        cloudName: string
-        apiKey: string
-        timestamp: number
-        folder: string
-        signature: string
-        params: Record<string, string | number>
-      }
+      const formData = new FormData()
+      formData.append("file", file)
+      formData.append("title", title)
+      formData.append("description", description)
+      formData.append("originalSize", file.size.toString())
 
-      // 2) Upload directly to Cloudinary
-      const uploadUrl = `https://api.cloudinary.com/v1_1/${cloudName}/video/upload`
-      const cloudForm = new FormData()
-      cloudForm.append("file", file)
-      cloudForm.append("api_key", apiKey)
-      cloudForm.append("timestamp", String(timestamp))
-      cloudForm.append("signature", signature)
-      cloudForm.append("folder", folder)
-      if (params["eager"]) cloudForm.append("eager", String(params["eager"]))
-
-      const cloudinaryResponse = await fetch(uploadUrl, {
-        method: "POST",
-        body: cloudForm,
-      })
-
-      if (!cloudinaryResponse.ok) {
-        throw new Error("Cloudinary upload failed")
-      }
-
-      const cloudJson = await cloudinaryResponse.json() as {
-        public_id: string
-        bytes: number
-        duration?: number
-      }
-
-      // 3) Persist metadata to DB
-      await axios.post("/api/videos", {
-        title,
-        description,
-        publicId: cloudJson.public_id,
-        originalSize: String(file.size),
-        compressedSize: String(cloudJson.bytes ?? file.size),
-        duration: cloudJson.duration ?? 0,
-      })
+      await axios.post("/api/video-upload", formData)
 
       setUploadProgress(100)
       setSuccess(true)
