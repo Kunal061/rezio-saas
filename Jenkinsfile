@@ -126,11 +126,30 @@ pipeline {
                     df -h | grep -E '(Filesystem|/dev/)'
                     echo "════════════════════════════════════════════════════"
                     
-                    # Warn if disk usage is above 80%
+                    # Check if disk usage is above 85% - FAIL the build
                     DISK_USAGE=$(df / | tail -1 | awk '{print $5}' | sed 's/%//')
-                    if [ $DISK_USAGE -gt 80 ]; then
-                        echo "⚠ WARNING: Disk usage is at ${DISK_USAGE}%!"
-                        echo "Consider cleaning up or increasing disk size"
+                    echo "Current disk usage: ${DISK_USAGE}%"
+                    
+                    if [ $DISK_USAGE -gt 85 ]; then
+                        echo ""
+                        echo "⚠⚠⚠ CRITICAL ERROR: Disk usage is at ${DISK_USAGE}%! ⚠⚠⚠"
+                        echo ""
+                        echo "Build cannot proceed with less than 15% free space."
+                        echo ""
+                        echo "REQUIRED ACTIONS:"
+                        echo "1. SSH to EC2: ssh -i your-key.pem ubuntu@your-ec2-ip"
+                        echo "2. Run: docker system prune -a -f --volumes"
+                        echo "3. Run: rm -rf ~/.npm /tmp/*"
+                        echo "4. Run: sudo journalctl --vacuum-time=1d"
+                        echo "5. Verify: df -h /"
+                        echo ""
+                        echo "OR increase EBS volume size in AWS Console to 30GB"
+                        echo ""
+                        exit 1
+                    elif [ $DISK_USAGE -gt 75 ]; then
+                        echo "⚠ WARNING: Disk usage is at ${DISK_USAGE}% - Consider cleanup soon"
+                    else
+                        echo "✓ Disk space is sufficient (${DISK_USAGE}% used)"
                     fi
                 '''
                 
