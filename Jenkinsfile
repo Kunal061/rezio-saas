@@ -30,21 +30,46 @@ pipeline {
     stages {
         stage('Cleanup Workspace') {
             steps {
-                echo 'Cleaning workspace...'
-                cleanWs()
+                echo 'Cleaning workspace and removing old files...'
+                
+                script {
+                    // Clean workspace completely
+                    cleanWs()
+                    
+                    // Remove any leftover Docker resources from previous builds
+                    sh '''
+                        # Remove stopped containers
+                        docker container prune -f || true
+                        
+                        # Remove dangling images
+                        docker image prune -f || true
+                        
+                        echo "✓ Workspace and Docker resources cleaned"
+                    '''
+                }
             }
         }
         
-        stage('Checkout Code') {
+        stage('Clone Repository') {
             steps {
-                echo 'Checking out source code...'
-                checkout scm
+                echo 'Cloning fresh code from GitHub...'
                 
                 script {
-                    // Display git information
+                    // Clone from GitHub repository
                     sh '''
+                        # Remove any existing git directory
+                        rm -rf .git
+                        
+                        # Clone the repository
+                        git clone https://github.com/Kunal061/rezio-saas.git .
+                        
+                        # Display git information
+                        echo "═══════════════════════════════════════════════════"
+                        echo "Repository: https://github.com/Kunal061/rezio-saas.git"
                         echo "Git Branch: $(git rev-parse --abbrev-ref HEAD)"
                         echo "Git Commit: $(git rev-parse --short HEAD)"
+                        echo "Commit Message: $(git log -1 --pretty=%B)"
+                        echo "═══════════════════════════════════════════════════"
                     '''
                 }
             }
