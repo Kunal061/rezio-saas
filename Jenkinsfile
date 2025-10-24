@@ -1,5 +1,5 @@
 pipeline {
-    agent {'pop'}
+    agent {label 'pop'}
     
     environment {
         // Application Configuration
