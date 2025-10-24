@@ -10,6 +10,7 @@ A modern, full‑stack video optimization SaaS built with Next.js App Router, Cl
 
 
 ## Table of Contents
+- [Quick Start](#quick-start)
 - [Features](#features)
 - [Architecture](#architecture)
 - [Directory Structure](#directory-structure)
@@ -29,6 +30,48 @@ A modern, full‑stack video optimization SaaS built with Next.js App Router, Cl
 - [Troubleshooting](#troubleshooting)
 - [Contributing](#contributing)
 - [License](#license)
+
+
+## Quick Start
+
+### 🆕 **First Time Setup (Cloned from Web)**
+
+If you cloned this project and don't have access to the original database or API keys:
+
+**Option 1: Interactive Setup (Recommended)**
+```bash
+# Run the interactive setup wizard
+./scripts/setup-env.sh
+
+# This will guide you through:
+# 1. Creating free accounts (Neon, Clerk, Cloudinary)
+# 2. Setting up your .env file
+# 3. Initializing the database
+```
+
+**Option 2: Manual Setup**
+
+See [`SETUP_FROM_SCRATCH.md`](./SETUP_FROM_SCRATCH.md) for complete step-by-step guide with:
+- Creating all required accounts (100% FREE)
+- Getting API keys and credentials
+- Database setup
+- Local testing
+- Production deployment
+
+### 🚀 **Already Configured?**
+
+```bash
+# Install dependencies
+npm install
+
+# Initialize database
+npx prisma generate
+npx prisma db push
+
+# Start development
+npm run dev
+# Open http://localhost:3000
+```
 
 
 ## Features

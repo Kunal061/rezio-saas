@@ -2,7 +2,16 @@
 
 This guide will help you set up automated CI/CD deployment for Rezio SaaS on your EC2 instance using Jenkins.
 
+> 🆕 **First time setting up?** Check [`SETUP_FROM_SCRATCH.md`](./SETUP_FROM_SCRATCH.md) for complete account creation and configuration guide!
+
 ## 📋 Prerequisites
+
+### Required Accounts (All FREE):
+- **Neon.tech** - PostgreSQL database hosting
+- **Clerk.com** - Authentication service
+- **Cloudinary.com** - Media storage and optimization
+
+> 📖 **Don't have these?** See [`SETUP_FROM_SCRATCH.md`](./SETUP_FROM_SCRATCH.md) for step-by-step account creation!
 
 ### On Your EC2 Instance:
 - Ubuntu/Amazon Linux 2 (recommended)
