@@ -28,24 +28,58 @@ pipeline {
     }
     
     stages {
+        stage('Clean Previous Build Residue') {
+            steps {
+                echo 'Cleaning all residue from previous builds...'
+                
+                script {
+                    sh '''
+                        echo "═══════════════════════════════════════════════════"
+                        echo "Cleaning Docker Resources from Previous Builds"
+                        echo "═══════════════════════════════════════════════════"
+                        
+                        # Stop and remove existing application container if running
+                        echo "Stopping existing containers..."
+                        docker stop ${CONTAINER_NAME} 2>/dev/null || echo "No container to stop"
+                        docker rm ${CONTAINER_NAME} 2>/dev/null || echo "No container to remove"
+                        
+                        # Aggressive cleanup to free disk space
+                        echo "Removing all stopped containers..."
+                        docker container prune -a -f 2>/dev/null || echo "Container prune completed"
+                        
+                        # Remove dangling AND unused images
+                        echo "Removing unused images..."
+                        docker image prune -a -f 2>/dev/null || echo "Image prune completed"
+                        
+                        # Remove unused volumes to free space
+                        echo "Removing unused volumes..."
+                        docker volume prune -f 2>/dev/null || echo "Volume prune completed"
+                        
+                        # Remove build cache to free space
+                        echo "Removing build cache..."
+                        docker builder prune -f 2>/dev/null || echo "Builder prune completed"
+                        
+                        echo "✓ Docker cleanup completed"
+                        
+                        # Show disk space after cleanup
+                        echo ""
+                        echo "Disk space after cleanup:"
+                        df -h / | tail -1
+                        echo ""
+                    '''
+                }
+            }
+        }
+        
         stage('Cleanup Workspace') {
             steps {
-                echo 'Cleaning workspace and removing old files...'
+                echo 'Cleaning workspace...'
                 
                 script {
                     // Clean workspace completely
                     cleanWs()
                     
-                    // Remove any leftover Docker resources from previous builds
-                    sh '''
-                        # Remove stopped containers
-                        docker container prune -f || true
-                        
-                        # Remove dangling images
-                        docker image prune -f || true
-                        
-                        echo "✓ Workspace and Docker resources cleaned"
-                    '''
+                    echo "✓ Workspace cleaned"
                 }
             }
         }
@@ -84,6 +118,20 @@ pipeline {
                     echo "Docker version: $(docker --version || echo 'Docker not found')"
                     echo "Build Number: ${BUILD_NUMBER}"
                     echo "Workspace: ${WORKSPACE}"
+                    
+                    # Check disk space
+                    echo ""
+                    echo "════════════════════════════════════════════════════"
+                    echo "Disk Space:"
+                    df -h | grep -E '(Filesystem|/dev/)'
+                    echo "════════════════════════════════════════════════════"
+                    
+                    # Warn if disk usage is above 80%
+                    DISK_USAGE=$(df / | tail -1 | awk '{print $5}' | sed 's/%//')
+                    if [ $DISK_USAGE -gt 80 ]; then
+                        echo "⚠ WARNING: Disk usage is at ${DISK_USAGE}%!"
+                        echo "Consider cleaning up or increasing disk size"
+                    fi
                 '''
                 
                 // Check if .env file exists on server
@@ -242,17 +290,23 @@ pipeline {
             steps {
                 echo 'Cleaning up old Docker images...'
                 sh '''
-                    # Remove dangling images
+                    # Remove dangling images again
                     docker image prune -f
                     
-                    # Keep only last 3 builds of this app
+                    # Keep only last 3 builds of this app (removes older versions)
+                    echo "Removing old image versions (keeping last 3)..."
                     docker images ${APP_NAME} --format "{{.ID}} {{.Tag}}" | \
                         grep -v latest | \
                         tail -n +4 | \
                         awk '{print $1}' | \
                         xargs -r docker rmi -f || true
                     
-                    echo "Cleanup completed"
+                    # Show remaining images
+                    echo ""
+                    echo "Remaining images:"
+                    docker images ${APP_NAME}
+                    
+                    echo "✓ Cleanup completed"
                 '''
             }
         }
