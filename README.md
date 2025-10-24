@@ -212,11 +212,48 @@ Notes:
 
 
 ## Production Deployment
-- Recommended: **Vercel** for Next.js hosting.
-- Set required environment variables in your host (see above).
-- Ensure the database is reachable from the hosting environment; for Vercel, use a managed Postgres (Neon, Supabase, RDS) and set `DATABASE_URL`.
+
+### Option 1: Vercel (Recommended for Quick Deploy)
+- Set required environment variables in Vercel dashboard.
+- Ensure the database is reachable from the hosting environment; use a managed Postgres (Neon, Supabase, RDS) and set `DATABASE_URL`.
 - Run `npx prisma migrate deploy` during build or as a post‑deploy step.
 - Configure Next.js `images.remotePatterns` (already set for Cloudinary and Clerk).
+
+### Option 2: EC2 with Docker and Jenkins CI/CD
+For self-hosted deployment with automated CI/CD on AWS EC2:
+
+**Quick Start:**
+```bash
+# 1. Set up environment variables
+cp .env.example .env
+# Edit .env with your values
+
+# 2. Deploy manually using the deployment script
+./scripts/deploy.sh
+
+# 3. Or use Docker Compose
+docker-compose up -d
+
+# 4. Access your app
+http://your-ec2-ip:2000
+```
+
+**Automated CI/CD with Jenkins:**
+- See [`DEPLOYMENT.md`](./DEPLOYMENT.md) for complete EC2 + Jenkins setup guide
+- See [`QUICK_REFERENCE.md`](./QUICK_REFERENCE.md) for quick commands reference
+- Jenkinsfile included for automated builds, tests, and deployment
+- Dockerfile optimized for production with multi-stage builds
+- Scripts provided for easy management:
+  - `scripts/deploy.sh` - Manual deployment
+  - `scripts/rollback.sh` - Rollback to previous version
+  - `scripts/manage.sh` - Interactive management menu
+
+**Files for Deployment:**
+- `Dockerfile` - Multi-stage production build
+- `Jenkinsfile` - Complete CI/CD pipeline
+- `docker-compose.yml` - Docker Compose configuration
+- `.dockerignore` - Optimized Docker build context
+- `.env.example` - Environment variables template
 
 
 ## Security & Compliance

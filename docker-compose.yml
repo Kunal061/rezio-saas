@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  rezio-saas:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rezio-saas-container
+    ports:
+      - "2000:2000"
+    env_file:
+      - .env
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:2000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - rezio-network
+
+  # Optional: PostgreSQL database (if you want to run DB locally)
+  # Uncomment if you want to use local PostgreSQL instead of NeonDB
+  # postgres:
+  #   image: postgres:16-alpine
+  #   container_name: rezio-postgres
+  #   environment:
+  #     POSTGRES_USER: ${POSTGRES_USER:-rezio}
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-rezio123}
+  #     POSTGRES_DB: ${POSTGRES_DB:-rezio_db}
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   networks:
+  #     - rezio-network
+  #   restart: unless-stopped
+
+networks:
+  rezio-network:
+    driver: bridge
+
+# Uncomment if using local PostgreSQL
+# volumes:
+#   postgres_data:
