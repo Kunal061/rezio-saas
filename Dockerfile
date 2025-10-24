@@ -1,4 +1,5 @@
 # Multi-stage Dockerfile for Next.js 15 with Prisma
+# Optimized for minimal disk usage during build
 
 # Stage 1: Dependencies
 FROM node:20-alpine AS deps
@@ -9,8 +10,10 @@ WORKDIR /app
 # Copy package files
 COPY package.json package-lock.json ./
 
-# Install dependencies
-RUN npm ci --legacy-peer-deps
+# Install dependencies with cleanup
+RUN npm ci --legacy-peer-deps && \
+    npm cache clean --force && \
+    rm -rf /tmp/*
 
 # Stage 2: Builder
 FROM node:20-alpine AS builder
@@ -31,11 +34,13 @@ COPY prisma ./prisma/
 RUN npx prisma generate
 
 # Build Next.js application
-# Note: Environment variables needed at build time should be passed as build args
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
-RUN npm run build
+RUN npm run build && \
+    npm cache clean --force && \
+    rm -rf /tmp/* && \
+    rm -rf /root/.npm
 
 # Stage 3: Production runner
 FROM node:20-alpine AS runner
